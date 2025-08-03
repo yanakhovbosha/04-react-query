@@ -11,19 +11,18 @@ import toast from "react-hot-toast";
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
-  const [isEmpty, setIsEmpty] = useState(false);
   const [isLoader, setIsLoader] = useState(false);
   const [isError, setIsError] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMovie, setselectedMovie] = useState<Movie | null>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setselectedMovie(null);
+    setSelectedMovie(null);
   };
   const handleMovie = (movie: Movie) => {
-    setselectedMovie(movie);
+    setSelectedMovie(movie);
     openModal();
   };
 
@@ -32,11 +31,9 @@ export default function App() {
       setMovies([]);
       setIsLoader(true);
       setIsError(false);
-      setIsEmpty(false);
       const data = await fetchMovies(query);
       if (data.length === 0) {
         toast.error("No movies found for your request.");
-        setIsEmpty(true);
         return;
       }
       setMovies(data);
@@ -54,7 +51,6 @@ export default function App() {
         <MovieGrid onSelect={handleMovie} movies={movies} />
       )}
       {isLoader && <Loader />}
-      {isEmpty}
       {isError && <ErrorMessage />}
       {isModalOpen && selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
