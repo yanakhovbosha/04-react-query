@@ -7,7 +7,7 @@ import { Movie } from "../../types/movie";
 import { useState } from "react";
 import MovieModal from "../MovieModal/MovieModal";
 import { fetchMovies } from "../../services/movieService";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -16,11 +16,14 @@ export default function App() {
   const [isError, setIsError] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMovie, setIsMovie] = useState<Movie | null>(null);
+  const [selectedMovie, setselectedMovie] = useState<Movie | null>(null);
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setselectedMovie(null);
+  };
   const handleMovie = (movie: Movie) => {
-    setIsMovie(movie);
+    setselectedMovie(movie);
     openModal();
   };
 
@@ -51,10 +54,10 @@ export default function App() {
         <MovieGrid onSelect={handleMovie} movies={movies} />
       )}
       {isLoader && <Loader />}
-      {isEmpty && <Toaster />}
+      {isEmpty}
       {isError && <ErrorMessage />}
-      {isModalOpen && isMovie && (
-        <MovieModal movie={isMovie} onClose={closeModal} />
+      {isModalOpen && selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
     </div>
   );
