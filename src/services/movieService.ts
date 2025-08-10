@@ -8,7 +8,10 @@ interface MovieResults {
 
 const myKey = import.meta.env.VITE_API_KEY;
 
-export const fetchMovies = async (query: string, page: number) => {
+export const fetchMovies = async (
+  query: string,
+  page: number
+): Promise<MovieResults> => {
   const response = await axios.get<MovieResults>(
     "https://api.themoviedb.org/3/search/movie",
     {
@@ -21,7 +24,6 @@ export const fetchMovies = async (query: string, page: number) => {
       },
     }
   );
-  console.log(response.data);
 
   return response.data;
 };

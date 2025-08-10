@@ -4,22 +4,22 @@ import MovieGrid from "../MovieGrid/MovieGrid";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import { Movie } from "../../types/movie";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MovieModal from "../MovieModal/MovieModal";
 import { fetchMovies } from "../../services/movieService";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import ReactPaginate from "react-paginate";
 
 export default function App() {
-  const [movies, setMovies] = useState("");
+  const [query, setQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["movie", movies, page],
-    queryFn: () => fetchMovies(movies, page),
-    enabled: movies !== "",
+    queryKey: ["movie", query, page],
+    queryFn: () => fetchMovies(query, page),
+    enabled: query !== "",
     placeholderData: keepPreviousData,
   });
 
@@ -38,13 +38,16 @@ export default function App() {
   };
 
   const handleSearch = async (query: string) => {
-    setMovies(query);
-    if (query.length === 0) {
+    setQuery(query);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    if (isSuccess && data?.results.length === 0) {
       toast.error("No movies found for your request.");
       return;
     }
-    setPage(1);
-  };
+  }, [isSuccess, data]);
 
   return (
     <div className={css.app}>
@@ -63,12 +66,13 @@ export default function App() {
         />
       )}
 
-      {data?.results && movies.length > 0 && (
+      {isSuccess && data?.results && (
         <MovieGrid onSelect={handleMovie} movies={data.results} />
       )}
 
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
+      <Toaster />
       {isModalOpen && selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
